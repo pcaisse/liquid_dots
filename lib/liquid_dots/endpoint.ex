@@ -1,7 +1,7 @@
 defmodule LiquidDots.Endpoint do
   use Phoenix.Endpoint, otp_app: :liquid_dots
 
-  socket "/socket", LiquidDots.UserSocket
+  socket "/socket", LiquidDots.DotSocket
 
   # Serve at "/" the static files from "priv/static" directory.
   #

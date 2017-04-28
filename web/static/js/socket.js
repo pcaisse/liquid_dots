@@ -54,9 +54,28 @@ let socket = new Socket("/socket", {params: {token: window.userToken}})
 socket.connect()
 
 // Now that you are connected, you can join channels with a topic:
-let channel = socket.channel("topic:subtopic", {})
+let channel = socket.channel("dots", {})
+
+const plusElem = document.querySelector("#plus")
+const minusElem = document.querySelector("#minus")
+const totalElem = document.querySelector("#total")
+
+function getTotal() {
+  return +totalElem.innerHTML
+}
+
+plusElem.addEventListener("click", event => {
+  channel.push("new_msg", {body: getTotal() + 1})
+})
+minusElem.addEventListener("click", event => {
+  channel.push("new_msg", {body: getTotal() - 1})
+})
+channel.on("new_msg", payload => {
+  totalElem.innerHTML = payload.body
+})
+
 channel.join()
-  .receive("ok", resp => { console.log("Joined successfully", resp) })
-  .receive("error", resp => { console.log("Unable to join", resp) })
+  .receive("ok", resp => { console.log("Yay!", resp) })
+  .receive("error", resp => { console.log("Boo", resp) })
 
 export default socket

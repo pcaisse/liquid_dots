@@ -1,8 +1,8 @@
-defmodule LiquidDots.UserSocket do
+defmodule LiquidDots.DotSocket do
   use Phoenix.Socket
 
   ## Channels
-  # channel "room:*", LiquidDots.RoomChannel
+  channel "dots", LiquidDots.DotChannel
 
   ## Transports
   transport :websocket, Phoenix.Transports.WebSocket
