@@ -11,7 +11,7 @@ defmodule LiquidDots do
       # Start the endpoint when the application starts
       supervisor(LiquidDots.Endpoint, []),
       # Start your own worker by calling: LiquidDots.Worker.start_link(arg1, arg2, arg3)
-      # worker(LiquidDots.Worker, [arg1, arg2, arg3]),
+      worker(LiquidDots.DotState, []),
     ]
 
     # See http://elixir-lang.org/docs/stable/elixir/Supervisor.html

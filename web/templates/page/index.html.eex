@@ -1,5 +1,2 @@
 <div id="main">
-  <button id="plus">+1</button>
-  <button id="minus">-1</button>
-  <p id="total">0</p>
 </div>

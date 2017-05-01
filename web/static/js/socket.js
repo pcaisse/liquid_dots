@@ -4,6 +4,8 @@
 // To use Phoenix channels, the first step is to import Socket
 // and connect at the socket path in "lib/my_app/endpoint.ex":
 import {Socket} from "phoenix"
+import {randomColor} from "randomcolor"
+import _ from "lodash"
 
 let socket = new Socket("/socket", {params: {token: window.userToken}})
 
@@ -55,27 +57,53 @@ socket.connect()
 
 // Now that you are connected, you can join channels with a topic:
 let channel = socket.channel("dots", {})
+const container = document.querySelector('.container')
 
-const plusElem = document.querySelector("#plus")
-const minusElem = document.querySelector("#minus")
-const totalElem = document.querySelector("#total")
-
-function getTotal() {
-  return +totalElem.innerHTML
+const DOT_DIAMETER_RANGE = {
+  min: 10,
+  max: 50,
 }
 
-plusElem.addEventListener("click", event => {
-  channel.push("new_msg", {body: getTotal() + 1})
-})
-minusElem.addEventListener("click", event => {
-  channel.push("new_msg", {body: getTotal() - 1})
-})
-channel.on("new_msg", payload => {
-  totalElem.innerHTML = payload.body
-})
+function plotDots(dots) {
+  _.forOwn(dots, (data, id) => {
+    const dotNode = document.createElement('div')
+    dotNode.className = 'circle'
+    dotNode.id = id
+    dotNode.style.backgroundColor = data.color
+    const offset = data.radius / 2
+    dotNode.style.left = data.x - offset + 'px'
+    dotNode.style.top = data.y - offset + 'px'
+    dotNode.style.width = data.radius + 'px'
+    dotNode.style.height = data.radius + 'px'
+    container.appendChild(dotNode)
+  })
+}
+
+function start(payload) {
+  let dots = payload.dots
+
+  // Plot dots on join
+  plotDots(dots)
+
+  // Add new dot on click
+  document.body.addEventListener("click", event => {
+    const newDot = {
+      color: randomColor(),
+      x: event.pageX,
+      y: event.pageY,
+      radius: _.random(DOT_DIAMETER_RANGE.min, DOT_DIAMETER_RANGE.max),
+    }
+    channel.push("dot:new", {new_dot_data: newDot})
+  })
+  // Show new dot
+  channel.on("dots", ({new_dot: new_dot}) => {
+    Object.assign(dots, new_dot)
+    plotDots(new_dot)
+  })
+}
 
 channel.join()
-  .receive("ok", resp => { console.log("Yay!", resp) })
+  .receive("ok", start)
   .receive("error", resp => { console.log("Boo", resp) })
 
 export default socket
