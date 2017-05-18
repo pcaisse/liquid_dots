@@ -1,6 +1,6 @@
 defmodule LiquidDots.DotState do
   @moduledoc """
-  Keep track of dot state (position and color).
+  Keep track of dot state.
   """
 
   def start_link do
@@ -14,6 +14,7 @@ defmodule LiquidDots.DotState do
   def put_new_dot(dot) do
     dots = get_dots()
     num_dots = map_size(dots)
+    # TODO: Fix this for rapid deletion
     new_dot_id = String.to_atom(to_string(num_dots + 1))
     Agent.update(__MODULE__, &Map.put_new(&1, new_dot_id, dot))
     %{new_dot_id => dot}
