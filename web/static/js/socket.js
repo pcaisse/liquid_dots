@@ -57,14 +57,14 @@ socket.connect()
 
 // Now that you are connected, you can join channels with a topic:
 let channel = socket.channel("dots", {})
-const container = document.querySelector('.container')
+const containerNode = document.querySelector('.container')
 
 const DOT_DIAMETER_RANGE = {
   min: 10,
   max: 50,
 }
 
-function plotDots(dots) {
+function plotDots(dots, fadeIn = false) {
   _.forOwn(dots, (data, id) => {
     const dotNode = document.createElement('div')
     dotNode.className = 'circle'
@@ -75,8 +75,16 @@ function plotDots(dots) {
     dotNode.style.top = data.y - offset + 'px'
     dotNode.style.width = data.radius + 'px'
     dotNode.style.height = data.radius + 'px'
-    container.appendChild(dotNode)
+    containerNode.appendChild(dotNode)
+    if (fadeIn) {
+      dotNode.classList.add('fadein')
+    }
   })
+}
+
+function removeDot(dotNode) {
+  dotNode.classList.add('fadeout')
+  setTimeout(() => containerNode.removeChild(dotNode), 1000)
 }
 
 function start(payload) {
@@ -85,20 +93,30 @@ function start(payload) {
   // Plot dots on join
   plotDots(dots)
 
-  // Add new dot on click
   document.body.addEventListener("click", event => {
-    const newDot = {
-      color: randomColor(),
-      x: event.pageX,
-      y: event.pageY,
-      radius: _.random(DOT_DIAMETER_RANGE.min, DOT_DIAMETER_RANGE.max),
+    if (event.target === document.body) {
+      // Add new dot
+      const newDot = {
+        color: randomColor(),
+        x: event.pageX,
+        y: event.pageY,
+        radius: _.random(DOT_DIAMETER_RANGE.min, DOT_DIAMETER_RANGE.max),
+      }
+      channel.push("dot:add", {new_dot_data: newDot})
+    } else {
+      // Delete existing dot
+      channel.push("dot:delete", {dot_id: event.target.id})
     }
-    channel.push("dot:new", {new_dot_data: newDot})
   })
   // Show new dot
-  channel.on("dots", ({new_dot: new_dot}) => {
+  channel.on("dot:added", ({new_dot: new_dot}) => {
     Object.assign(dots, new_dot)
-    plotDots(new_dot)
+    plotDots(new_dot, true)
+  })
+  channel.on("dot:deleted", ({dot_id: dot_id}) => {
+    delete dots[_.toInteger(dot_id)]
+    const dotNode = document.getElementById(dot_id)
+    removeDot(dotNode)
   })
 }
 

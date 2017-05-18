@@ -21,5 +21,6 @@ defmodule LiquidDots.DotState do
 
   def delete_dot(dot_id) do
     Agent.update(__MODULE__, &Map.delete(&1, dot_id))
+    dot_id
   end
 end
