@@ -7,11 +7,15 @@ defmodule LiquidDots.DotState do
     Agent.start_link(fn -> {%{}, 0} end, name: __MODULE__)
   end
 
+  def get do
+    Agent.get(__MODULE__, &(&1))
+  end
+
   @doc """
   Get all dots.
   """
   def get_dots do
-    {dots, _} = Agent.get(__MODULE__, &(&1))
+    {dots, _} = get()
     dots
   end
 
@@ -19,23 +23,25 @@ defmodule LiquidDots.DotState do
   Get the count of all dots that ever existed.
   """
   def get_count do
-    {_, count} = Agent.get(__MODULE__, &(&1))
+    {_, count} = get()
     count
   end
 
   def put_new_dot(dot) do
-    new_count = get_count() + 1
-    new_dot_id = Integer.to_string(new_count)
-    Agent.update(__MODULE__, fn({map, _}) ->
-      {Map.put_new(map, new_dot_id, dot), new_count}
+    Agent.get_and_update(__MODULE__, fn({map, count}) ->
+      new_count = count + 1
+      new_dot_id = Integer.to_string(new_count)
+      updated_map = Map.put_new(map, new_dot_id, dot)
+      updated_state = {updated_map, new_count}
+      new_dot_state = Map.take(updated_map, [new_dot_id])
+      {new_dot_state, updated_state}
     end)
-    %{new_dot_id => dot}
   end
 
   def delete_dot(dot_id) do
-    Agent.update(__MODULE__, fn({map, count}) ->
-      {Map.delete(map, dot_id), count}
+    Agent.get_and_update(__MODULE__, fn({map, count}) ->
+      updated_state = {Map.delete(map, dot_id), count}
+      {dot_id, updated_state}
     end)
-    dot_id
   end
 end

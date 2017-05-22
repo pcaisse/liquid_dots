@@ -77,13 +77,17 @@ function plotDots(dots, fadeIn = false) {
     dotNode.style.height = data.radius + 'px'
     containerNode.appendChild(dotNode)
     if (fadeIn) {
-      dotNode.classList.add('fadein')
+      dotNode.classList.add('fade')
+      dotNode.style.opacity = 1
     }
   })
 }
 
 function removeDot(dotNode) {
-  dotNode.classList.add('fadeout')
+  if (!dotNode.classList.contains('fade')) {
+    dotNode.classList.add('fade')
+  }
+  dotNode.style.opacity = 0
   setTimeout(() => containerNode.removeChild(dotNode), 1000)
 }
 
@@ -103,7 +107,7 @@ function start(payload) {
         radius: _.random(DOT_DIAMETER_RANGE.min, DOT_DIAMETER_RANGE.max),
       }
       channel.push("dot:add", {new_dot_data: newDot})
-    } else {
+    } else if (dots[event.target.id]) {
       // Delete existing dot
       channel.push("dot:delete", {dot_id: event.target.id})
     }
@@ -114,7 +118,7 @@ function start(payload) {
     plotDots(new_dot, true)
   })
   channel.on("dot:deleted", ({dot_id: dot_id}) => {
-    delete dots[_.toInteger(dot_id)]
+    delete dots[dot_id]
     const dotNode = document.getElementById(dot_id)
     removeDot(dotNode)
   })
