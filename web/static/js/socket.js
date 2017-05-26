@@ -77,17 +77,16 @@ function plotDots(dots, fadeIn = false) {
     dotNode.style.height = data.radius + 'px'
     containerNode.appendChild(dotNode)
     if (fadeIn) {
-      dotNode.classList.add('fade')
-      dotNode.style.opacity = 1
+      dotNode.classList.add('fade-in')
     }
   })
 }
 
 function removeDot(dotNode) {
-  if (!dotNode.classList.contains('fade')) {
-    dotNode.classList.add('fade')
+  if (dotNode.classList.contains('fade-in')) {
+    dotNode.classList.remove('fade-in')
   }
-  dotNode.style.opacity = 0
+  dotNode.classList.add('fade-out')
   setTimeout(() => containerNode.removeChild(dotNode), 1000)
 }
 
