@@ -7,24 +7,12 @@ defmodule LiquidDots.DotState do
     Agent.start_link(fn -> {%{}, 0} end, name: __MODULE__)
   end
 
-  def get do
-    Agent.get(__MODULE__, &(&1))
-  end
-
   @doc """
   Get all dots.
   """
   def get_dots do
-    {dots, _} = get()
+    {dots, _} = Agent.get(__MODULE__, &(&1))
     dots
-  end
-
-  @doc """
-  Get the count of all dots that ever existed.
-  """
-  def get_count do
-    {_, count} = get()
-    count
   end
 
   def put_new_dot(dot) do
