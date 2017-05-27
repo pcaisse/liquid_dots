@@ -3,20 +3,23 @@ defmodule LiquidDots.DotState do
   Keep track of dot state.
   """
 
-  def start_link do
-    Agent.start_link(fn -> {%{}, 0} end, name: __MODULE__)
+  @doc """
+  Start link to agent.
+  """
+  def start_link(name \\ __MODULE__, map \\ %{}) do
+    Agent.start_link(fn -> {map, Map.size(map)} end, name: name)
   end
 
   @doc """
   Get all dots.
   """
-  def get_dots do
-    {dots, _} = Agent.get(__MODULE__, &(&1))
+  def get_dots(agent \\ __MODULE__) do
+    {dots, _} = Agent.get(agent, &(&1))
     dots
   end
 
-  def put_new_dot(dot) do
-    Agent.get_and_update(__MODULE__, fn({map, count}) ->
+  def put_new_dot(agent \\ __MODULE__, dot) do
+    Agent.get_and_update(agent, fn({map, count}) ->
       new_count = count + 1
       new_dot_id = Integer.to_string(new_count)
       updated_map = Map.put_new(map, new_dot_id, dot)
@@ -26,8 +29,8 @@ defmodule LiquidDots.DotState do
     end)
   end
 
-  def delete_dot(dot_id) do
-    Agent.get_and_update(__MODULE__, fn({map, count}) ->
+  def delete_dot(agent \\ __MODULE__, dot_id) do
+    Agent.get_and_update(agent, fn({map, count}) ->
       updated_state = {Map.delete(map, dot_id), count}
       {dot_id, updated_state}
     end)
