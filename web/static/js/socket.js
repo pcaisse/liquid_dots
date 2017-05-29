@@ -70,11 +70,11 @@ function plotDots(dots, fadeIn = false) {
     dotNode.className = 'circle'
     dotNode.id = id
     dotNode.style.backgroundColor = data.color
-    const offset = data.radius / 2
+    const offset = data.diameter / 2
     dotNode.style.left = data.x - offset + 'px'
     dotNode.style.top = data.y - offset + 'px'
-    dotNode.style.width = data.radius + 'px'
-    dotNode.style.height = data.radius + 'px'
+    dotNode.style.width = data.diameter + 'px'
+    dotNode.style.height = data.diameter + 'px'
     containerNode.appendChild(dotNode)
     if (fadeIn) {
       dotNode.classList.add('fade-in')
@@ -103,7 +103,7 @@ function start(payload) {
         color: randomColor(),
         x: event.pageX,
         y: event.pageY,
-        radius: _.random(DOT_DIAMETER_RANGE.min, DOT_DIAMETER_RANGE.max),
+        diameter: _.random(DOT_DIAMETER_RANGE.min, DOT_DIAMETER_RANGE.max),
       }
       channel.push("dot:add", {new_dot_data: newDot})
     } else if (dots[event.target.id]) {
