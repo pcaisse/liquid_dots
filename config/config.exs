@@ -18,7 +18,7 @@ config :logger, :console,
   format: "$time $metadata[$level] $message\n",
   metadata: [:request_id]
 
-# Uncommend this to broadcast
+# Uncomment this to broadcast
 #config :app, App.Endpoint,
   #http: [ip: {0, 0, 0, 0}, port: 4000]
 
